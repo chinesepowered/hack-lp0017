@@ -1,0 +1,20 @@
+[package]
+name = "whistleblower-registry-methods"
+description = "Build artifacts for the Whistleblower SPEL registry program"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[build-dependencies]
+# `risc0-build` compiles the RISC0 zkVM guest. Pulled in only when the
+# RISC0 toolchain (rzup) is present — the host workspace does not depend
+# on this build step for `cargo check`.
+risc0-build = { version = "3", optional = true }
+
+[features]
+default = []
+build-guest = ["dep:risc0-build"]
+
+[lib]
+path = "src/lib.rs"

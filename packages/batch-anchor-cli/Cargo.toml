@@ -1,0 +1,23 @@
+[package]
+name = "batch-anchor-cli"
+description = "Permissionless batch anchor for the Whistleblower indexing pipeline"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[[bin]]
+name = "batch-anchor"
+path = "src/main.rs"
+
+[dependencies]
+whistleblower-core = { path = "../whistleblower-core" }
+tokio = { workspace = true, features = ["rt-multi-thread", "macros", "sync", "time", "fs", "signal"] }
+clap.workspace = true
+anyhow.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+async-trait.workspace = true
+hex.workspace = true

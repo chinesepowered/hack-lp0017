@@ -1,0 +1,32 @@
+[package]
+name = "whistleblower-core"
+description = "Reusable document-indexing module for the Logos stack — upload, broadcast, anchor"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[lib]
+crate-type = ["rlib", "cdylib"]
+
+[dependencies]
+serde.workspace = true
+serde_json.workspace = true
+sha2.workspace = true
+hex.workspace = true
+thiserror.workspace = true
+anyhow.workspace = true
+async-trait.workspace = true
+tokio = { workspace = true, optional = true }
+tracing.workspace = true
+
+[features]
+default = ["tokio"]
+# `tokio` feature enables the default-sleep retry helper. Disable it for
+# environments that bring their own runtime (e.g. WASM in a browser).
+tokio = ["dep:tokio"]
+# `ffi` exposes a C ABI surface for native Logos Basecamp apps (QML/C++).
+ffi = []
+
+[dev-dependencies]
+tokio = { workspace = true, features = ["test-util"] }

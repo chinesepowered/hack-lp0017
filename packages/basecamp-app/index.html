@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Whistleblower — Logos Basecamp app</title>
+    <link rel="stylesheet" href="/src/styles.css" />
+  </head>
+  <body>
+    <main id="app">
+      <header>
+        <h1>Whistleblower</h1>
+        <p class="tagline">
+          Upload a document. Broadcast it. Anchor it on-chain — or let someone
+          else do that part. No central server. No takedowns.
+        </p>
+      </header>
+
+      <section id="upload-section">
+        <h2>1. Upload &amp; broadcast</h2>
+        <form id="upload-form">
+          <label>
+            <span>File</span>
+            <input type="file" id="file" required />
+          </label>
+          <label>
+            <span>Title</span>
+            <input type="text" id="title" maxlength="256" required />
+          </label>
+          <label>
+            <span>Description</span>
+            <textarea id="description" maxlength="4096" rows="3"></textarea>
+          </label>
+          <label>
+            <span>Tags (comma-separated)</span>
+            <input type="text" id="tags" placeholder="leak, finance, q3" />
+          </label>
+          <button type="submit" id="submit">Upload &amp; broadcast</button>
+        </form>
+        <div id="upload-result" hidden></div>
+      </section>
+
+      <section id="anchor-section" hidden>
+        <h2>2. Anchor on-chain <span class="hint">(optional)</span></h2>
+        <p>
+          Anchoring writes the CID to the LEZ registry so the document is
+          permanently discoverable. If you don't anchor now, anyone running
+          the <code>batch-anchor</code> tool can do it for you — your upload
+          is already broadcast.
+        </p>
+        <button id="anchor-btn">Anchor this document</button>
+        <div id="anchor-result" hidden></div>
+      </section>
+
+      <section id="discover-section">
+        <h2>Live feed</h2>
+        <p class="hint">
+          Subscribed to <code id="topic"></code>. Each row is a broadcast
+          envelope from the network — yours and others'.
+        </p>
+        <table id="feed">
+          <thead>
+            <tr>
+              <th>Time</th>
+              <th>CID</th>
+              <th>Title</th>
+              <th>Size</th>
+              <th>Anchored?</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </section>
+
+      <footer>
+        <p>
+          Whistleblower v0.1 ·
+          <a href="https://github.com/chinesepowered/hack-lp0017" target="_blank" rel="noopener">source</a> ·
+          LP-0017
+        </p>
+      </footer>
+    </main>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

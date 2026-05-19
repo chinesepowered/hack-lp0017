@@ -1,0 +1,31 @@
+{
+  "name": "@whistleblower/indexing-module",
+  "version": "0.1.0",
+  "description": "Reusable document-indexing module for the Logos stack: upload → broadcast → anchor",
+  "license": "(MIT OR Apache-2.0)",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./adapters/in-memory": {
+      "import": "./dist/adapters/in-memory.js",
+      "types": "./dist/adapters/in-memory.d.ts"
+    }
+  },
+  "files": ["dist", "README.md"],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.0",
+    "@types/node": "^20.11.0",
+    "vitest": "^1.4.0"
+  }
+}
