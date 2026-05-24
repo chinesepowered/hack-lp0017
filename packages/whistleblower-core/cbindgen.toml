@@ -1,0 +1,19 @@
+# cbindgen config — emits whistleblower_core.h for native Basecamp consumers.
+#
+# Usage:
+#   cargo install cbindgen
+#   cbindgen --config cbindgen.toml --crate whistleblower-core --output whistleblower_core.h
+
+language = "C"
+header = "/* whistleblower-core — generated header. See LICENSE-MIT / LICENSE-APACHE. */"
+include_guard = "WHISTLEBLOWER_CORE_H"
+cpp_compat = true
+documentation = true
+documentation_style = "c99"
+
+[parse]
+parse_deps = false
+
+[export]
+include = ["WbStringResult"]
+prefix = ""

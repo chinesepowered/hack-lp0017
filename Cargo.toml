@@ -1,0 +1,33 @@
+[workspace]
+members = [
+    "packages/whistleblower-core",
+    "packages/batch-anchor-cli",
+    "packages/registry-program/methods",
+]
+exclude = [
+    # Guest crate is its own workspace — its target is a different triple (riscv32im-risc0-zkvm-elf)
+    # and pulling it into the host workspace breaks `cargo check`.
+    "packages/registry-program/methods/guest",
+    "packages/registry-program/program_core",
+]
+resolver = "2"
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/chinesepowered/hack-lp0017"
+
+[workspace.dependencies]
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+borsh = "1.5"
+sha2 = "0.10"
+hex = "0.4"
+thiserror = "1"
+anyhow = "1"
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "sync", "time", "fs", "signal", "io-util", "net", "process"] }
+async-trait = "0.1"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter", "fmt"] }
+clap = { version = "4", features = ["derive", "env"] }

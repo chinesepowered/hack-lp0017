@@ -1,0 +1,103 @@
+name: CI
+
+on:
+  push:
+    branches: [main, "claude/**"]
+  pull_request:
+    branches: [main]
+
+env:
+  CARGO_TERM_COLOR: always
+  RUSTFLAGS: "-D warnings"
+
+jobs:
+  rust:
+    name: Rust ${{ matrix.toolchain }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        toolchain: [stable]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust ${{ matrix.toolchain }}
+        run: |
+          rustup toolchain install ${{ matrix.toolchain }} --component rustfmt clippy
+          rustup default ${{ matrix.toolchain }}
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          shared-key: workspace
+
+      - name: rustfmt
+        run: cargo fmt --all -- --check
+
+      - name: clippy (workspace)
+        run: cargo clippy --workspace --all-targets -- -D warnings
+
+      - name: build
+        run: cargo build --workspace --all-targets
+
+      - name: test
+        run: cargo test --workspace --all-targets
+
+      - name: idl is in sync with the source
+        # When the SPEL toolchain is available we re-generate and diff the
+        # checked-in IDL. Otherwise we just verify the file is valid JSON
+        # so a typo can't merge unnoticed.
+        run: |
+          if command -v spel >/dev/null 2>&1; then
+            spel generate-idl packages/registry-program/methods/guest/src/bin/whistleblower_registry.rs \
+              > /tmp/idl.json
+            diff -u packages/registry-program/idl/whistleblower-registry-idl.json /tmp/idl.json
+          else
+            python3 -c "import json,sys; json.load(open('packages/registry-program/idl/whistleblower-registry-idl.json'))"
+          fi
+
+  typescript:
+    name: TypeScript (Node ${{ matrix.node }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node: [20, 22]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+
+      - name: install
+        run: npm install --workspaces --include-workspace-root
+
+      - name: typecheck
+        run: npm run typecheck --workspaces --if-present
+
+      - name: build
+        run: npm run build --workspaces --if-present
+
+      - name: test
+        run: npm run test --workspaces --if-present
+
+  integration:
+    name: End-to-end demo (mock backend)
+    needs: [rust, typescript]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - run: rustup toolchain install stable
+      - uses: Swatinem/rust-cache@v2
+
+      - name: run end-to-end demo
+        run: bash scripts/demo.sh
+
+      - name: run cu benchmark
+        run: bash scripts/benchmark.sh
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: benchmarks
+          path: docs/BENCHMARKS.md

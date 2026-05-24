@@ -1,0 +1,130 @@
+{
+  "version": "0.1.0",
+  "name": "whistleblower_registry",
+  "description": "On-chain registry of (cid, metadata_hash, anchor_timestamp) for the Whistleblower app. Single and batched submissions, both idempotent.",
+  "instructions": [
+    {
+      "name": "anchor_single",
+      "doc": "Anchor a single document. Idempotent: re-submitting an already-anchored CID is a no-op.",
+      "accounts": [
+        {
+          "name": "record",
+          "writable": true,
+          "signer": false,
+          "init": true,
+          "pda": {
+            "seeds": [
+              { "kind": "const", "value": "wb_v1" },
+              { "kind": "arg",   "name":  "cid" }
+            ]
+          }
+        },
+        {
+          "name": "anchorer",
+          "writable": false,
+          "signer": true,
+          "init": false
+        }
+      ],
+      "args": [
+        { "name": "cid",           "type": "string"    },
+        { "name": "metadata_hash", "type": { "array": ["u8", 32] } },
+        { "name": "block_time",    "type": "u64"       }
+      ]
+    },
+    {
+      "name": "anchor_batch",
+      "doc": "Anchor up to 50 documents in a single transaction. Each entry is idempotent independently — existing entries are silently skipped, new entries are written.",
+      "accounts": [
+        {
+          "name": "anchorer",
+          "writable": false,
+          "signer": true,
+          "init": false
+        },
+        {
+          "name": "records",
+          "writable": true,
+          "signer": false,
+          "init": false,
+          "slice": true,
+          "init_if_empty": true,
+          "pda": {
+            "seeds": [
+              { "kind": "const",     "value": "wb_v1" },
+              { "kind": "arg_index", "name": "entries", "field": "cid" }
+            ]
+          }
+        }
+      ],
+      "args": [
+        {
+          "name": "entries",
+          "type": {
+            "vec": {
+              "defined": "AnchorEntry"
+            }
+          }
+        },
+        { "name": "block_time", "type": "u64" }
+      ]
+    },
+    {
+      "name": "lookup",
+      "doc": "Read-only: returns the anchor PDA for the given CID. The caller decodes it via `spel inspect --type AnchorAccount`.",
+      "accounts": [
+        {
+          "name": "record",
+          "writable": false,
+          "signer": false,
+          "init": false,
+          "pda": {
+            "seeds": [
+              { "kind": "const", "value": "wb_v1" },
+              { "kind": "arg",   "name":  "cid" }
+            ]
+          }
+        }
+      ],
+      "args": [
+        { "name": "cid", "type": "string" }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "AnchorAccount",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          { "name": "cid",              "type": "string" },
+          { "name": "metadata_hash",    "type": { "array": ["u8", 32] } },
+          { "name": "anchor_timestamp", "type": "u64" },
+          { "name": "anchored_by",      "type": { "array": ["u8", 32] } }
+        ]
+      }
+    }
+  ],
+  "types": [
+    {
+      "name": "AnchorEntry",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          { "name": "cid",           "type": "string" },
+          { "name": "metadata_hash", "type": { "array": ["u8", 32] } }
+        ]
+      }
+    }
+  ],
+  "constants": [
+    { "name": "MAX_BATCH",          "type": "u32", "value": 50 },
+    { "name": "MIN_REQUIRED_BATCH", "type": "u32", "value": 10 }
+  ],
+  "metadata": {
+    "schema": "whistleblower/v1",
+    "delivery_topic": "/logos/whistleblower/v1/documents",
+    "framework": "spel",
+    "target": "lez-testnet"
+  }
+}

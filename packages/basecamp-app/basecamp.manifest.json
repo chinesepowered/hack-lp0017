@@ -1,0 +1,30 @@
+{
+  "schema": "logos-basecamp/app-manifest/v1",
+  "id": "io.logos.apps.whistleblower",
+  "name": "Whistleblower",
+  "version": "0.1.0",
+  "description": "Upload, broadcast, and anchor documents on the Logos stack. No central server, no takedowns.",
+  "icon": "assets/icon.svg",
+  "entry": {
+    "type": "web",
+    "url": "dist/index.html"
+  },
+  "permissions": [
+    "logos.storage:put",
+    "logos.delivery:publish",
+    "logos.delivery:subscribe",
+    "logos.lez:call"
+  ],
+  "delivery_topics": [
+    "/logos/whistleblower/v1/documents"
+  ],
+  "programs": [
+    {
+      "name": "whistleblower_registry",
+      "idl": "../registry-program/idl/whistleblower-registry-idl.json"
+    }
+  ],
+  "authors": ["LP-0017 submission"],
+  "license": "MIT OR Apache-2.0",
+  "repository": "https://github.com/chinesepowered/hack-lp0017"
+}
