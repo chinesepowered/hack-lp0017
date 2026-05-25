@@ -58,6 +58,19 @@ jobs:
       - name: Install spel CLI
         run: cargo install --git https://github.com/logos-co/spel spel
 
+      - name: Pre-seed spel cache (workaround for logos-scaffold pin)
+        run: |
+          # logos-scaffold pins spel at a commit that's orphaned (squash-merged).
+          # Normal clone + fetch --all won't retrieve it. Pre-seed the cache
+          # with a full clone and explicitly fetch the pinned commit.
+          SPEL_PIN="ed3bbedb4b684645da05455d30a4a0be7cc4dfe0"
+          CACHE_DIR="$HOME/.cache/logos-scaffold/repos/spel/$SPEL_PIN"
+          mkdir -p "$CACHE_DIR"
+          git clone https://github.com/logos-co/spel.git "$CACHE_DIR"
+          cd "$CACHE_DIR"
+          git fetch origin "$SPEL_PIN" && git checkout "$SPEL_PIN" || \
+            (git fetch --unshallow 2>/dev/null; git fetch origin "$SPEL_PIN" && git checkout "$SPEL_PIN")
+
       - name: Scaffold project + boot local sequencer
         run: |
           cd /tmp
