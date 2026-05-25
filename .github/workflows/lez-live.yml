@@ -58,12 +58,16 @@ jobs:
       - name: Install spel CLI
         run: cargo install --git https://github.com/logos-co/spel spel
 
-      - name: Boot local sequencer
+      - name: Scaffold project + boot local sequencer
         run: |
+          cd /tmp
+          logos-scaffold create whistleblower-devnet
+          cd whistleblower-devnet
           logos-scaffold setup
-          logos-scaffold localnet start
+          logos-scaffold localnet start --timeout-sec 30
           sleep 5
           echo "NSSA_WALLET_HOME_DIR=$PWD/.scaffold/wallet" >> $GITHUB_ENV
+          echo "SCAFFOLD_DIR=/tmp/whistleblower-devnet" >> $GITHUB_ENV
 
       - name: Build registry program (RISC0 guest)
         working-directory: packages/registry-program
@@ -73,13 +77,10 @@ jobs:
         working-directory: packages/registry-program
         run: make idl
 
-      - name: Create anchorer wallet
-        working-directory: packages/registry-program
-        run: make setup
-
-      - name: Deploy registry program
+      - name: Create anchorer wallet + deploy registry
         working-directory: packages/registry-program
         run: |
+          make setup 2>&1 | tee /tmp/setup.log || true
           make deploy 2>&1 | tee /tmp/deploy.log
           PROGRAM_ID=$(grep -oP 'Program ID: \K[a-f0-9]+' /tmp/deploy.log || grep -oP '[a-f0-9]{64}' /tmp/deploy.log | head -1)
           echo "WHISTLEBLOWER_PROGRAM_ID=$PROGRAM_ID" >> $GITHUB_ENV
