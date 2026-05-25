@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Reproducible end-to-end demo for LP-0017.
+# Reproducible end-to-end demo for Whistleblower.
 #
 # Modes:
 #   MOCK   (default) — runs against the in-memory adapters. No external
@@ -27,7 +27,7 @@ DOC="$ROOT/.demo-doc.txt"
 cd "$ROOT"
 
 echo "════════════════════════════════════════════════════════════════"
-echo "  Whistleblower demo — LP-0017"
+echo "  Whistleblower demo"
 echo "  Mode: $MODE"
 if [ "$MODE" = "LEZ" ]; then
   echo "  RISC0_DEV_MODE=${RISC0_DEV_MODE:-0}"
@@ -112,7 +112,7 @@ async fn main() -> anyhow::Result<()> {
         title: "Demo document".into(),
         description: format!("from {}", path),
         content_type: "text/plain".into(),
-        tags: vec!["demo".into(), "lp0017".into()],
+        tags: vec!["demo".into(), "whistleblower".into()],
     }).await?;
     println!("PUBLISH ok  cid={}  size={}  topic={}",
         r.envelope.cid, r.envelope.size_bytes, whistleblower_core::DEFAULT_DELIVERY_TOPIC);

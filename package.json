@@ -2,18 +2,13 @@
   "name": "whistleblower",
   "version": "0.1.0",
   "private": true,
-  "description": "Whistleblower — censorship-resistant document upload and indexing for the Logos stack (LP-0017)",
+  "description": "Whistleblower — censorship-resistant document upload and indexing for the Logos stack",
   "license": "(MIT OR Apache-2.0)",
-  "workspaces": [
-    "packages/indexing-module",
-    "packages/basecamp-app",
-    "packages/batch-anchor-cli"
-  ],
   "scripts": {
-    "build": "npm run build --workspaces --if-present",
-    "test": "npm run test --workspaces --if-present",
-    "lint": "npm run lint --workspaces --if-present",
-    "typecheck": "npm run typecheck --workspaces --if-present",
+    "build": "pnpm -r run build",
+    "test": "pnpm -r run test",
+    "lint": "pnpm -r run lint",
+    "typecheck": "pnpm -r run typecheck",
     "demo": "bash scripts/demo.sh",
     "benchmark": "bash scripts/benchmark.sh"
   },
@@ -24,5 +19,6 @@
   },
   "engines": {
     "node": ">=20"
-  }
+  },
+  "packageManager": "pnpm@10.22.0"
 }

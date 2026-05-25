@@ -1,0 +1,104 @@
+name: LEZ live-stack demo
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, "claude/**"]
+    paths:
+      - packages/registry-program/**
+      - scripts/demo.sh
+      - scripts/benchmark.sh
+      - .github/workflows/lez-live.yml
+
+env:
+  CARGO_TERM_COLOR: always
+  RISC0_DEV_MODE: "0"
+
+jobs:
+  lez-demo:
+    name: Build registry + deploy + demo (LEZ devnet)
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust stable
+        run: |
+          rustup toolchain install stable
+          rustup default stable
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          shared-key: lez-live
+          cache-on-failure: true
+
+      - name: Install RISC0 toolchain
+        run: |
+          curl -L https://risczero.com/install | bash
+          echo "$HOME/.risc0/bin" >> $GITHUB_PATH
+          export PATH="$HOME/.risc0/bin:$PATH"
+          rzup install
+
+      - name: Install logos-scaffold
+        run: cargo install --git https://github.com/logos-co/logos-scaffold
+
+      - name: Install spel CLI
+        run: cargo install --git https://github.com/logos-co/spel spel
+
+      - name: Boot local sequencer
+        run: |
+          logos-scaffold setup
+          logos-scaffold localnet start
+          sleep 5
+          echo "NSSA_WALLET_HOME_DIR=$PWD/.scaffold/wallet" >> $GITHUB_ENV
+
+      - name: Build registry program (RISC0 guest)
+        working-directory: packages/registry-program
+        run: make build
+
+      - name: Generate IDL
+        working-directory: packages/registry-program
+        run: make idl
+
+      - name: Create anchorer wallet
+        working-directory: packages/registry-program
+        run: make setup
+
+      - name: Deploy registry program
+        working-directory: packages/registry-program
+        run: |
+          make deploy 2>&1 | tee /tmp/deploy.log
+          PROGRAM_ID=$(grep -oP 'Program ID: \K[a-f0-9]+' /tmp/deploy.log || grep -oP '[a-f0-9]{64}' /tmp/deploy.log | head -1)
+          echo "WHISTLEBLOWER_PROGRAM_ID=$PROGRAM_ID" >> $GITHUB_ENV
+          ANCHORER=$(grep ANCHORER .registry-state | cut -d= -f2)
+          echo "ANCHORER=$ANCHORER" >> $GITHUB_ENV
+
+      - name: Run end-to-end demo (LEZ, real proofs)
+        run: MODE=LEZ bash scripts/demo.sh 2>&1 | tee /tmp/demo-output.txt
+
+      - name: Run CU benchmark (LEZ)
+        run: MODE=LEZ bash scripts/benchmark.sh 2>&1 | tee /tmp/benchmark-output.txt
+
+      - name: Upload demo + benchmark output
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lez-live-output
+          path: |
+            /tmp/demo-output.txt
+            /tmp/benchmark-output.txt
+            docs/BENCHMARKS.md
+            packages/registry-program/.registry-state
+
+      - name: Print summary
+        if: always()
+        run: |
+          echo "## LEZ Live Demo Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- RISC0_DEV_MODE: $RISC0_DEV_MODE" >> $GITHUB_STEP_SUMMARY
+          echo "- Program ID: ${WHISTLEBLOWER_PROGRAM_ID:-unknown}" >> $GITHUB_STEP_SUMMARY
+          echo "- Anchorer: ${ANCHORER:-unknown}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          tail -20 /tmp/demo-output.txt 2>/dev/null || echo "demo output not available"
+          echo '```' >> $GITHUB_STEP_SUMMARY

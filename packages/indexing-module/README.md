@@ -1,15 +1,15 @@
 # @whistleblower/indexing-module
 
 Reusable upload → broadcast → anchor pipeline for the Logos stack. Extracted
-from the Whistleblower Basecamp app (LP-0017) so any Logos application that
-needs censorship-resistant content publication can drop it in.
+from the Whistleblower Basecamp app so any Logos application that needs
+censorship-resistant content publication can drop it in.
 
 ## Why this exists
 
-The bounty (LP-0017) requires that the Whistleblower app's pipeline be
-extractable as a "self-contained module with a documented API, reusable by
-other Logos apps without depending on the Whistleblower Basecamp app
-itself." This package is that module.
+The Whistleblower app's pipeline is designed to be extractable as a
+self-contained module with a documented API, reusable by other Logos apps
+without depending on the Whistleblower Basecamp app itself. This package
+is that module.
 
 The same logic is also published as a Rust crate (`whistleblower-core`) for
 native callers — the batch-anchor CLI, the QML Basecamp app FFI, and any

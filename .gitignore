@@ -11,3 +11,6 @@ dist/
 .vscode/
 *.log
 .DS_Store
+narration/*.mp3
+.env
+package-lock.json

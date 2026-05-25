@@ -69,17 +69,19 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
 
-      - name: install
-        run: npm install --workspaces --include-workspace-root
+      - uses: pnpm/action-setup@v4
 
-      - name: typecheck
-        run: npm run typecheck --workspaces --if-present
+      - name: install
+        run: pnpm install
 
       - name: build
-        run: npm run build --workspaces --if-present
+        run: pnpm -r run build
+
+      - name: typecheck
+        run: pnpm -r run typecheck
 
       - name: test
-        run: npm run test --workspaces --if-present
+        run: pnpm -r run test
 
   integration:
     name: End-to-end demo (mock backend)

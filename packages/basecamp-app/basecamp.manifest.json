@@ -24,7 +24,7 @@
       "idl": "../registry-program/idl/whistleblower-registry-idl.json"
     }
   ],
-  "authors": ["LP-0017 submission"],
+  "authors": ["Whistleblower contributors"],
   "license": "MIT OR Apache-2.0",
   "repository": "https://github.com/chinesepowered/hack-lp0017"
 }

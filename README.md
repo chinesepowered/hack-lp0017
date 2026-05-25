@@ -48,7 +48,7 @@ Everything is dual-licensed MIT OR Apache-2.0.
 ```bash
 # from a clean clone, no external services required
 cargo build --workspace --release
-npm install
+pnpm install
 bash scripts/demo.sh
 ```
 
@@ -265,7 +265,7 @@ the LEZ devnet path.
 .
 ├── README.md, docs/ARCHITECTURE.md, docs/DEMO.md, docs/BENCHMARKS.md
 ├── Cargo.toml                            # Rust workspace root
-├── package.json                          # npm workspace root
+├── package.json                          # pnpm workspace root
 ├── rust-toolchain.toml, rustfmt.toml     # pinned Rust toolchain + format
 ├── scripts/demo.sh                       # reproducible end-to-end demo
 ├── scripts/benchmark.sh                  # CU benchmark → docs/BENCHMARKS.md

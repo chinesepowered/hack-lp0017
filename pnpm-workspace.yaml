@@ -1,0 +1,3 @@
+packages:
+  - packages/indexing-module
+  - packages/basecamp-app

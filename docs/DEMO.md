@@ -1,7 +1,7 @@
 # Demo walkthrough
 
 Two flavours: a hermetic mock demo that runs anywhere, and the real
-end-to-end demo against a live LEZ devnet that the bounty evaluators
+end-to-end demo against a live LEZ devnet that evaluators
 will reproduce.
 
 ## 1. Mock demo (no Logos services required)
@@ -93,7 +93,7 @@ What you'll see in the terminal:
 
 ### Recording the video
 
-The bounty requires terminal output that confirms `RISC0_DEV_MODE=0`. Use:
+The submission requires terminal output that confirms `RISC0_DEV_MODE=0`. Use:
 
 ```bash
 asciinema rec -c "RISC0_DEV_MODE=0 MODE=LEZ bash scripts/demo.sh" demo.cast
@@ -108,9 +108,9 @@ will look for.
 For a visual demo without QML/Basecamp installed:
 
 ```bash
-npm install
-npm --workspace=@whistleblower/basecamp-app run build
-npm --workspace=@whistleblower/basecamp-app run preview
+pnpm install
+pnpm --filter @whistleblower/basecamp-app build
+pnpm --filter @whistleblower/basecamp-app preview
 # open http://127.0.0.1:4173/
 ```
 

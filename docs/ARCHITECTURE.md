@@ -57,7 +57,7 @@ adapters in `packages/batch-anchor-cli/src/adapters/` (and the
 
 ### 1. Why one canonical Rust crate + a TS port instead of just TS?
 
-The bounty wants the module reusable by other Logos apps. The
+The module must be reusable by other Logos apps. The
 ecosystem's actual primitives — Basecamp apps (C++/QML), the
 `logos-delivery-module` (Qt/C++), LEZ programs (Rust on RISC0), the
 `spel` and `wallet` CLIs (Rust) — are all native. A Rust crate exposes
@@ -71,13 +71,13 @@ test (`packages/whistleblower-core/tests/cross_lang.rs` +
 
 ### 2. Why a LEZ program over a zone-SDK consensus submission?
 
-Bounty asks the submitter to choose and justify. We chose **LEZ program**
+The submitter must choose and justify. We chose **LEZ program**
 because:
 
 - **Permissionless** — any signer can call `anchor_batch`. The zone-SDK
   consensus-layer path currently requires a single designated actor
   (decentralised sequencers for zones aren't shipped yet), which would
-  re-introduce a coordination requirement the bounty explicitly forbids.
+  re-introduce a coordination requirement the design explicitly forbids.
 - **Idempotence at the program level** — `init_if_empty` PDA lets the
   program skip duplicates without the client needing to coordinate.
 - **Cheaper batched semantics** — one RISC0 proof per 50-CID batch
@@ -119,8 +119,8 @@ extended in a follow-up — see "Out of scope for this PR" below.
 The `Publisher` does NOT require an `AnchorAdapter`. A publisher who
 holds no on-chain funds can still upload + broadcast; an altruistic
 third party (NGO, journalist collective, automated guardian) picks the
-CID up off the topic and anchors it. This is the central reason the
-bounty exists, and it's why `publisher.anchor()` is a separate optional
+CID up off the topic and anchors it. This is the central design goal,
+and it's why `publisher.anchor()` is a separate optional
 method rather than part of `publish()`.
 
 ## What's mocked vs. live
