@@ -52,7 +52,7 @@ mod whistleblower_registry {
     pub fn anchor_batch(
         #[account(signer)]
         anchorer: AccountWithMetadata,
-        #[account(init, pda = [const("wb_v1"), arg("entries[i].cid")])]
+        #[account(init)]
         mut records: Vec<AccountWithMetadata>,
         entries: Vec<AnchorEntry>,
         block_time: u64,
