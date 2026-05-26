@@ -21,7 +21,7 @@ mod whistleblower_registry {
 
     #[instruction]
     pub fn anchor_single(
-        #[account(init, pda = [const("wb_v1"), arg("cid")])]
+        #[account(init, pda = [literal("wb_v1"), arg("cid")])]
         mut record: AccountWithMetadata,
         #[account(signer)]
         anchorer: AccountWithMetadata,
@@ -104,7 +104,7 @@ mod whistleblower_registry {
 
     #[instruction]
     pub fn lookup(
-        #[account(pda = [const("wb_v1"), arg("cid")])]
+        #[account(pda = [literal("wb_v1"), arg("cid")])]
         record: AccountWithMetadata,
         cid: String,
     ) -> SpelResult {
