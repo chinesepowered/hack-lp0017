@@ -21,7 +21,7 @@ mod whistleblower_registry {
 
     #[instruction]
     pub fn anchor_single(
-        #[account(init, pda = derive(b"wb_v1", arg("cid")))]
+        #[account(init, pda = [const("wb_v1"), arg("cid")])]
         mut record: AccountWithMetadata,
         #[account(signer)]
         anchorer: AccountWithMetadata,
@@ -52,7 +52,7 @@ mod whistleblower_registry {
     pub fn anchor_batch(
         #[account(signer)]
         anchorer: AccountWithMetadata,
-        #[account(init, pda = derive(b"wb_v1", arg("entries[i].cid")))]
+        #[account(init, pda = [const("wb_v1"), arg("entries[i].cid")])]
         mut records: Vec<AccountWithMetadata>,
         entries: Vec<AnchorEntry>,
         block_time: u64,
@@ -104,7 +104,7 @@ mod whistleblower_registry {
 
     #[instruction]
     pub fn lookup(
-        #[account(pda = derive(b"wb_v1", arg("cid")))]
+        #[account(pda = [const("wb_v1"), arg("cid")])]
         record: AccountWithMetadata,
         cid: String,
     ) -> SpelResult {
