@@ -10,7 +10,7 @@ name = "whistleblower_registry"
 path = "src/bin/whistleblower_registry.rs"
 
 [dependencies]
-spel-framework = { git = "https://github.com/logos-co/spel.git", rev = "refs/heads/main" }
+spel-framework = { git = "https://github.com/logos-co/spel.git", rev = "d24dbaac" }
 nssa_core = { git = "https://github.com/logos-blockchain/logos-execution-zone.git", tag = "v0.2.0-rc1" }
 risc0-zkvm = { version = "=3.0.5", features = ["std"] }
 whistleblower_registry_core = { path = "../../program_core" }
