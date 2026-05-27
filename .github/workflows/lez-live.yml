@@ -60,9 +60,6 @@ jobs:
 
       - name: Pre-seed spel cache (workaround for logos-scaffold pin)
         run: |
-          # logos-scaffold pins spel at a commit that's orphaned (squash-merged).
-          # Normal clone + fetch --all won't retrieve it. Pre-seed the cache
-          # with a full clone and explicitly fetch the pinned commit.
           SPEL_PIN="ed3bbedb4b684645da05455d30a4a0be7cc4dfe0"
           CACHE_DIR="$HOME/.cache/logos-scaffold/repos/spel/$SPEL_PIN"
           mkdir -p "$CACHE_DIR"
@@ -81,6 +78,12 @@ jobs:
           sleep 5
           echo "NSSA_WALLET_HOME_DIR=$PWD/.scaffold/wallet" >> $GITHUB_ENV
           echo "SCAFFOLD_DIR=/tmp/whistleblower-devnet" >> $GITHUB_ENV
+          echo "$PWD/target/release" >> $GITHUB_PATH
+
+      - name: Verify wallet on PATH
+        run: |
+          which wallet || (echo "wallet not on PATH, searching..."; find /tmp/whistleblower-devnet -name wallet -type f 2>/dev/null; ls -la /tmp/whistleblower-devnet/target/release/wallet 2>/dev/null || true)
+          wallet --help 2>&1 | head -5 || true
 
       - name: Build registry program (RISC0 guest)
         working-directory: packages/registry-program
@@ -98,18 +101,15 @@ jobs:
           echo "--- deploy.log ---"
           cat /tmp/deploy.log
           echo "--- end deploy.log ---"
-          # Try multiple patterns to extract program ID
           PROGRAM_ID=$(grep -oP 'Program ID: \K[a-f0-9]+' /tmp/deploy.log 2>/dev/null || true)
           if [ -z "$PROGRAM_ID" ]; then
             PROGRAM_ID=$(grep -oP 'program.id.*?([a-f0-9]{64})' /tmp/deploy.log 2>/dev/null | grep -oP '[a-f0-9]{64}' | head -1 || true)
           fi
           if [ -z "$PROGRAM_ID" ]; then
-            # Use cargo risczero to compute program ID from the built ELF
-            PROGRAM_ID=$(cargo risczero build-id --elf methods/guest/target/riscv32im-risc0-zkvm-elf/docker/whistleblower_registry.bin 2>/dev/null | grep -oP '[a-f0-9]{64}' | head -1 || true)
+            PROGRAM_ID=$(grep -oP '[a-f0-9]{64}' /tmp/deploy.log 2>/dev/null | head -1 || true)
           fi
           if [ -z "$PROGRAM_ID" ]; then
-            echo "WARNING: Could not extract PROGRAM_ID from deploy log, trying lgs inspect"
-            PROGRAM_ID=$(lgs build idl 2>/dev/null | grep -oP '"program_id"\s*:\s*"([a-f0-9]+)"' | grep -oP '[a-f0-9]{64}' | head -1 || true)
+            PROGRAM_ID=$(cargo risczero build-id --elf methods/guest/target/riscv32im-risc0-zkvm-elf/docker/whistleblower_registry.bin 2>/dev/null | grep -oP '[a-f0-9]{64}' | head -1 || true)
           fi
           echo "WHISTLEBLOWER_PROGRAM_ID=$PROGRAM_ID" >> $GITHUB_ENV
           echo "Extracted PROGRAM_ID=$PROGRAM_ID"
