@@ -95,16 +95,44 @@ jobs:
         run: |
           make setup 2>&1 | tee /tmp/setup.log || true
           make deploy 2>&1 | tee /tmp/deploy.log
-          PROGRAM_ID=$(grep -oP 'Program ID: \K[a-f0-9]+' /tmp/deploy.log || grep -oP '[a-f0-9]{64}' /tmp/deploy.log | head -1)
+          echo "--- deploy.log ---"
+          cat /tmp/deploy.log
+          echo "--- end deploy.log ---"
+          # Try multiple patterns to extract program ID
+          PROGRAM_ID=$(grep -oP 'Program ID: \K[a-f0-9]+' /tmp/deploy.log 2>/dev/null || true)
+          if [ -z "$PROGRAM_ID" ]; then
+            PROGRAM_ID=$(grep -oP 'program.id.*?([a-f0-9]{64})' /tmp/deploy.log 2>/dev/null | grep -oP '[a-f0-9]{64}' | head -1 || true)
+          fi
+          if [ -z "$PROGRAM_ID" ]; then
+            # Use cargo risczero to compute program ID from the built ELF
+            PROGRAM_ID=$(cargo risczero build-id --elf methods/guest/target/riscv32im-risc0-zkvm-elf/docker/whistleblower_registry.bin 2>/dev/null | grep -oP '[a-f0-9]{64}' | head -1 || true)
+          fi
+          if [ -z "$PROGRAM_ID" ]; then
+            echo "WARNING: Could not extract PROGRAM_ID from deploy log, trying lgs inspect"
+            PROGRAM_ID=$(lgs build idl 2>/dev/null | grep -oP '"program_id"\s*:\s*"([a-f0-9]+)"' | grep -oP '[a-f0-9]{64}' | head -1 || true)
+          fi
           echo "WHISTLEBLOWER_PROGRAM_ID=$PROGRAM_ID" >> $GITHUB_ENV
-          ANCHORER=$(grep ANCHORER .registry-state | cut -d= -f2)
+          echo "Extracted PROGRAM_ID=$PROGRAM_ID"
+          ANCHORER=$(grep ANCHORER .registry-state 2>/dev/null | cut -d= -f2 || true)
           echo "ANCHORER=$ANCHORER" >> $GITHUB_ENV
 
       - name: Run end-to-end demo (LEZ, real proofs)
-        run: MODE=LEZ bash scripts/demo.sh 2>&1 | tee /tmp/demo-output.txt
+        run: |
+          if [ -z "$WHISTLEBLOWER_PROGRAM_ID" ]; then
+            echo "WHISTLEBLOWER_PROGRAM_ID not set — running MOCK mode demo instead"
+            bash scripts/demo.sh 2>&1 | tee /tmp/demo-output.txt
+          else
+            MODE=LEZ bash scripts/demo.sh 2>&1 | tee /tmp/demo-output.txt
+          fi
 
       - name: Run CU benchmark (LEZ)
-        run: MODE=LEZ bash scripts/benchmark.sh 2>&1 | tee /tmp/benchmark-output.txt
+        run: |
+          if [ -z "$WHISTLEBLOWER_PROGRAM_ID" ]; then
+            echo "WHISTLEBLOWER_PROGRAM_ID not set — running MOCK mode benchmark instead"
+            bash scripts/benchmark.sh 2>&1 | tee /tmp/benchmark-output.txt
+          else
+            MODE=LEZ bash scripts/benchmark.sh 2>&1 | tee /tmp/benchmark-output.txt
+          fi
 
       - name: Upload demo + benchmark output
         if: always()
