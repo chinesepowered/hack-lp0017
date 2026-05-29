@@ -1,23 +1,23 @@
-# Whistleblower — narration script (~1:15)
+# Whistleblower — narration script (~1:30)
 
-_Stage directions are in italic-only lines and are stripped before TTS._
+_Stage directions are italic-only lines and are stripped before TTS._
 
-_SHOW: README.md, scroll slowly through the title and "What we built" table_
+_SHOW: README.md top — title, CI badges, one-line pitch._
 
-This is Whistleblower, a censorship-resistant document upload and indexing app for the Logos stack. A user selects a file, adds metadata, and submits. The app uploads the bytes to Logos Storage, broadcasts the CID and metadata envelope over Logos Delivery, and optionally anchors the CID on-chain via a SPEL program on the Logos Execution Zone.
+This is Whistleblower — a censorship-resistant document upload and indexing app for the Logos stack, built as a Basecamp app. A user picks a file, adds metadata, and submits. The app uploads the bytes to Logos Storage, broadcasts the CID and metadata over Logos Delivery so it's instantly discoverable, and can anchor the CID on-chain through a SPEL program on the Logos Execution Zone.
 
-_SHOW: README.md, scroll to the pipeline diagram_
+_SHOW: scroll slowly to the pipeline diagram._
 
-The key design decision is that anchoring is decoupled from publication. The uploader does not need tokens or any coordination. Any third party can run the batch-anchor CLI, subscribe to the delivery topic, accumulate CIDs, and commit them on-chain in batches of up to fifty per transaction.
+The key decision is that anchoring is decoupled from publication. The uploader needs no tokens and no coordination. Any third party can run the batch-anchor CLI, accumulate CIDs from the topic, and commit up to fifty per transaction — idempotently, enforced at three independent layers.
 
-_SHOW: docs/ARCHITECTURE.md, scroll to the idempotence section_
+_SHOW: scroll to the "What we built" table._
 
-Idempotence is enforced at three layers: delivery dedup, the CLI's persisted seen-set, and the registry's init-if-empty PDA check. Re-submitting an already-anchored CID is always a no-op.
+It ships the Basecamp app, a reusable indexing module in Rust and TypeScript with byte-identical envelopes, the SPEL registry program with its IDL, and the permissionless batch-anchor CLI.
 
-_SHOW: terminal running the demo with RISC0_DEV_MODE=0_
+_SHOW: scroll to "Proven on a live LEZ sequencer", then cut to the GitHub Actions page._
 
-Here is the end-to-end demo running against a live LEZ sequencer with RISC0 dev mode zero — real proof generation. The file uploads, the envelope broadcasts on the topic, the batch anchor picks up the CID and submits an anchor-batch instruction, and the lookup confirms it is registered on-chain with its metadata hash and timestamp.
+Now the proof — and it isn't mocked. On every push, the LEZ live-stack workflow boots a real sequencer, builds the RISC0 guest with dev-mode off, meaning real proofs, and deploys the registry to the running chain.
 
-_SHOW: CI green checks or terminal showing all tests pass_
+_SHOW: the green lez-live run; expand the deploy step showing the program_id JSON._
 
-All tests pass — eight Rust, eleven TypeScript, and the full end-to-end demo. That is the complete submission. Link in the description.
+Here's the green run. Deploy returns a real program ID — the RISC0 image ID computed from the binary, so anyone can rebuild and verify it. Standard CI also runs clippy, nine Rust tests, and eleven TypeScript tests, all green on main. That's the submission. Link in the description.
