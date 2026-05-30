@@ -1,7 +1,8 @@
 # Whistleblower
 
-[![CI](https://github.com/chinesepowered/hack-lp0017/actions/workflows/ci.yml/badge.svg)](https://github.com/chinesepowered/hack-lp0017/actions/workflows/ci.yml)
 [![LEZ live-stack demo](https://github.com/chinesepowered/hack-lp0017/actions/workflows/lez-live.yml/badge.svg)](https://github.com/chinesepowered/hack-lp0017/actions/workflows/lez-live.yml)
+
+**📺 [Watch the Voiceover Demo Video](https://www.youtube.com/watch?v=hVZjDfp0DpI)**
 
 **A Logos Basecamp app that lets anyone upload a document and make it
 permanently discoverable — without a central server, without requiring
