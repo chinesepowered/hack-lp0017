@@ -4,6 +4,8 @@
 
 **📺 [Watch the Voiceover Demo Video](https://www.youtube.com/watch?v=hVZjDfp0DpI)**
 
+**📺 [Proof on Chain](https://github.com/chinesepowered/hack-lp0017/actions/runs/26578762529/job/78305405638)**
+
 **A Logos Basecamp app that lets anyone upload a document and make it
 permanently discoverable — without a central server, without requiring
 the uploader to hold tokens, and without a single point of censorship.**
